@@ -1,74 +1,86 @@
-@extends('layouts.app')
+@extends('layouts.master')
 
-@section('title')  Notes @endsection
-@section('css')
-    <link href="{{asset('css/rotating-card.css')}}" rel="stylesheet"/>
+@section('title') Notes @endsection
 
-@endsection
 @section('content')
-    <div class="row">
-        <h1 class="card-title mb-4 text-center"> Notes </h1>
+    <!-- hero section start -->
+    @include('layouts.includes.alerts.success')
+    @include('layouts.includes.alerts.errors')
 
-        @include('layouts.includes.alerts.success')
-        @include('layouts.includes.alerts.errors')
-        @foreach($notes as $note)
-            <div class="col-md-4">
-                <div class="card mb-3">
-                    <img class="card-img-top" src="{{$note->image ?? asset('assets/images/notes/default-placeholder.png')}}"
-                         alt="Card image cap">
-                    <div class="card-body">
-                        <a href="{{route('users.show',$note->users->id)}}" class="card-title mb-2 "
-                           style="font-size: 20px">{{$note->users->name}}</a>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p class="card-text m-1">
-                                    {{$note->created_at->diffForHumans()}}
-                                </p>
-                            </div>
-                        </div>
-                        <p class="card-text">{{$note->content}}</p>
-                        <p>
-                            @if($note->type == \App\Enums\NoteType::Normal->value)
-                                <span class="badge bg-primary font-size-12">{{$note->type}}</span>
-                            @elseif ($note->type == \App\Enums\NoteType::Urgent->value)
-                                <span class="badge bg-danger font-size-12">{{$note->type}}</span>
-                            @endif
-                        </p>
-
-                        <div class="card-footer">
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <div class="d-flex gap-3">
-                                        <a href="{{route('users.notes',$note->users->id)}}" class="text-info"><i class="fa fa-share-alt"
-                                                                                                                 style="font-size: 18px"></i></a>
+    <!-- currency price section start -->
+    @include('layouts.includes.header')
+    <!-- currency price section end -->
+    <div class="text-end">
+        <button type="button"
+                class="btn btn-primary btn-rounded waves-effect waves-light m-3 me-3"
+                onclick="window.location.href='{{route('notes.create')}}'"><i
+                class="mdi mdi-plus me-1"></i>Add Note
+        </button>
+    </div>
+    <div class="page-content">
+        <!-- Start content -->
+        <div class="container-fluid">
+            <div class="row">
+                @foreach($notes as $note)
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="product-img position-relative">
+                                    <div class="avatar-sm product-ribbon">
+                                                                @if($note->type == \App\Enums\NoteType::Normal->value)
+                                                                <span class="avatar-title rounded-circle  bg-primary">{{$note->type}}</span>
+                                                            @elseif ($note->type == \App\Enums\NoteType::Urgent->value)
+                                                                <span class="avatar-title rounded-circle  bg-danger ">{{$note->type}}</span>
+                                                            @endif
                                     </div>
+                                    <img src="{{$note->image ?? asset('assets/images/notes/default-placeholder.png')}}" alt=""
+                                         class="img-fluid mx-auto d-block">
                                 </div>
-                                @auth
-                                    @if ($note->user_id === auth()->id())
-                                        <div class="col-md-4">
-                                            <a href="{{route('notes.edit',$note->id)}}" class="text-primary"><i class="fa fa-pencil-alt"
-                                                                                                                style="font-size: 18px ;margin-left: 15px; "></i></a>
-                                            <a href="#" id="delete" data-id="{{$note->id}}" class="text-danger"><i class="fa fa-trash"
-                                                                                                                   style="font-size: 18px;margin-left: 15px; "></i></a>
-                                        </div>
-                                    @endif
-                                @endauth
+                                <div class="mt-4 text-center">
+                                    <a href="{{route('users.show',$note->users->id)}}" class="card-title mb-2 "
+                                       style="font-size: 20px"><h5>{{$note->users->name}}</h5></a>
+                                    <p class="text-muted mb-0">{!! \Illuminate\Support\Str::limit($note->content, 160, '...') !!}</p>
+                                    <h5 class="mt-2"><span class="text-muted me-2 ">{{$note->created_at->diffForHumans()}}</span></h5>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent border-top text-center">
+                                <div class="d-flex mb-0 team-social-links" id="tooltip-container5">
+                                    <div class="flex-fill">
+                                        <a href="{{route('users.notes',$note->users->id)}}" class="text-info"><i class="fa fa-share-alt"
+                                                                                                                 style="font-size: 16px"></i></a>
+                                    </div>
+                                    @auth
+                                        @if ($note->user_id === auth()->id())
+                                            <div class="flex-fill">
+                                                <a href="{{route('notes.edit',$note->id)}}" class="text-primary"><i
+                                                        class="fa fa-pencil-alt"
+                                                        style="font-size: 16px ; "></i></a>
+
+                                            </div>
+                                            <div class="flex-fill">
+                                                <a href="#" id="delete" data-id="{{$note->id}}" class="text-danger"><i
+                                                        class="fa fa-trash"
+                                                        style="font-size: 16px; "></i></a>
+                                            </div>
+                                        @endif
+                                    @endauth
+                                </div>
                             </div>
 
                         </div>
                     </div>
-                </div><!-- end card -->
+                @endforeach
             </div>
-
-        @endforeach
+        </div>
     </div>
-    {!! $notes->links() !!}
+    <!-- hero section end -->
 
 @endsection
 
 @section('script')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js" defer></script>
-
+    <script src="{{ URL::asset('assets/libs/chart-js/chart-js.min.js') }}"></script>
+@endsection
+@section('script-bottom')
     <script>
         $(document).on('click', '#delete', function () {
             var id = $(this).attr('data-id');
@@ -82,7 +94,7 @@
                     } else {
                         $.ajax({
                             type: 'DELETE',
-                            url: '{{url('/destroy/')}}' + "/" + id,
+                            url: '{{url('/notes/destroy/')}}' + "/" + id,
                             dataType: 'json',
                             headers: {
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -98,9 +110,12 @@
                             }
                         });
                     }
-
                 }
             });
         });
     </script>
 @endsection
+
+
+
+

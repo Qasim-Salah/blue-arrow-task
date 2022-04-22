@@ -2,12 +2,14 @@
 
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Auth::routes();
+Route::get('/', [HomeController::class, 'index'])->name('index');
 
-Route::prefix('/')->name('notes.')->group(function () {
+Route::prefix('/notes')->name('notes.')->group(function () {
 
     Route::get('/', [NoteController::class, 'index'])->name('index');
 
